@@ -15,6 +15,7 @@ How to deal with block level style applied over table elements? e.g. text align
 import re, argparse
 import io, os
 import urllib.request
+import base64
 from urllib.parse import urlparse
 from html.parser import HTMLParser
 
@@ -306,6 +307,11 @@ class HtmlToDocx(HTMLParser):
         else:
             image = src
         # add image to doc
+        if image and image.startswith('data:image/'):
+            # -- convert to bytes ready to insert to docx
+            image = image.split(',')[1]
+            image = base64.b64decode(image)
+            image = io.BytesIO(image)
         if image:
             try:
                 if isinstance(self.doc, docx.document.Document):
